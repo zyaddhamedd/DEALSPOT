@@ -52,12 +52,18 @@ export const loadProducts = (): Product[] => {
   }
 };
 
-export const saveProducts = (products: Product[]) => {
+export const saveProducts = (products: Product[]): boolean => {
   if (!canUseStorage()) {
-    return;
+    return false;
   }
 
-  window.localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+  try {
+    window.localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+    return true;
+  } catch (error) {
+    console.error("Failed to save products to localStorage:", error);
+    return false;
+  }
 };
 
 export const resetProducts = () => {

@@ -57,7 +57,7 @@ export function ProductImageManager({
           throw new Error(`${file.name} is not a supported image file.`);
         }
 
-        convertedImages.push(await convertImageToWebP(file, 0.82, 1400));
+        convertedImages.push(await convertImageToWebP(file, 0.75, 1000));
       }
 
       const nextImages = [...product.images, ...convertedImages];

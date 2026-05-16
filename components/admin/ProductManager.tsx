@@ -83,9 +83,13 @@ export function ProductManager() {
   };
 
   const handleSave = () => {
-    saveProducts(products);
-    setSavedProducts(products);
-    setToast("تم حفظ تعديلات المنتج محليًا.");
+    const success = saveProducts(products);
+    if (success) {
+      setSavedProducts(products);
+      setToast("تم حفظ تعديلات المنتج بنجاح.");
+    } else {
+      setToast("⚠️ فشل الحفظ! مساحة التخزين في المتصفح ممتلئة. يرجى تقليل حجم الصور المرفوعة.");
+    }
   };
 
   const handleResetCurrent = () => {
@@ -120,11 +124,16 @@ export function ProductManager() {
     };
 
     const updatedProducts = [newProduct, ...products];
-    setProducts(updatedProducts);
-    saveProducts(updatedProducts);
-    setSavedProducts(updatedProducts);
-    setSelectedProductId(newId);
-    setToast("تم إضافة منتج جديد. يمكنك الآن تعديل بياناته.");
+    const success = saveProducts(updatedProducts);
+    
+    if (success) {
+      setProducts(updatedProducts);
+      setSavedProducts(updatedProducts);
+      setSelectedProductId(newId);
+      setToast("تم إضافة منتج جديد بنجاح.");
+    } else {
+      setToast("⚠️ فشل إضافة المنتج! مساحة التخزين ممتلئة.");
+    }
   };
 
   const handleDeleteProduct = (productId: string) => {
