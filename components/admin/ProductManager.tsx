@@ -117,23 +117,27 @@ export function ProductManager() {
       salePrice: 0,
       images: [],
       sizes: ["37", "38", "39", "40", "41"],
-      active: false,
+      active: true, // Make active by default so it shows up
       featured: false,
       reviews: [],
       faq: []
     };
 
-    const updatedProducts = [newProduct, ...products];
-    const success = saveProducts(updatedProducts);
-    
-    if (success) {
-      setProducts(updatedProducts);
-      setSavedProducts(updatedProducts);
-      setSelectedProductId(newId);
-      setToast("تم إضافة منتج جديد بنجاح.");
-    } else {
-      setToast("⚠️ فشل إضافة المنتج! مساحة التخزين ممتلئة.");
-    }
+    // Ensure we are working with the latest products state
+    setProducts((current) => {
+      const updated = [newProduct, ...current];
+      const success = saveProducts(updated);
+      
+      if (success) {
+        setSavedProducts(updated);
+        setSelectedProductId(newId);
+        setToast("تم إضافة منتج جديد بنجاح. ابدأ بتعديله الآن.");
+        return updated;
+      } else {
+        setToast("⚠️ فشل الإضافة! مساحة التخزين ممتلئة.");
+        return current;
+      }
+    });
   };
 
   const handleDeleteProduct = (productId: string) => {
