@@ -14,8 +14,31 @@ export function ProductGrid() {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    setProducts(sortProducts(loadProducts().filter((product) => product.active)));
-    setIsHydrated(true);
+    const fetchProducts = async () => {
+      try {
+        const localProducts = loadProducts();
+        const res = await fetch("/api/products");
+        if (!res.ok) throw new Error("Failed to fetch");
+        const dbProducts = await res.json();
+        
+        // Merge products: prioritize DB, add local if unique slug
+        const merged = [...dbProducts];
+        localProducts.forEach((lp) => {
+          if (!merged.find((dp) => dp.slug === lp.slug)) {
+            merged.push(lp);
+          }
+        });
+        
+        setProducts(sortProducts(merged.filter((product) => product.active)));
+      } catch (error) {
+        console.error("DB Fetch failed, falling back to local:", error);
+        setProducts(sortProducts(loadProducts().filter((product) => product.active)));
+      } finally {
+        setIsHydrated(true);
+      }
+    };
+
+    void fetchProducts();
   }, []);
 
   if (isHydrated && products.length === 0) {

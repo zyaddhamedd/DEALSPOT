@@ -130,12 +130,12 @@ export function OrderForm({
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!validate()) return;
     setIsSubmitting(true);
 
-    createOrder(product, {
+    const payload = {
       ...form,
       size: selectedSizeValue,
       color: selectedColorValue,
@@ -144,22 +144,44 @@ export function OrderForm({
       governorate: form.governorate.trim(),
       address: form.address.trim(),
       notes: form.notes?.trim(),
-    });
+      productSlug: product.slug, // Added for DB logic
+    };
 
-    setSuccessMessage("تم تسجيل طلبك بنجاح، هنتواصل معاك لتأكيد الأوردر.");
-    setForm({
-      fullName: "",
-      phone: "",
-      governorate: "",
-      address: "",
-      size: selectedSizeValue,
-      color: selectedColorValue,
-      quantity: 1,
-      notes: "",
-    });
-    setErrors({});
-    setIsSubmitting(false);
-    onSuccess?.();
+    try {
+      // 1. Production DB Submission
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to place order in DB");
+      }
+
+      // 2. Local Legacy Storage (for current admin view)
+      createOrder(product, payload);
+
+      setSuccessMessage("تم تسجيل طلبك بنجاح، هنتواصل معاك لتأكيد الأوردر.");
+      setForm({
+        fullName: "",
+        phone: "",
+        governorate: "",
+        address: "",
+        size: selectedSizeValue,
+        color: selectedColorValue,
+        quantity: 1,
+        notes: "",
+      });
+      setErrors({});
+      onSuccess?.();
+    } catch (error) {
+      console.error("Order failed:", error);
+      setErrors({ fullName: "عذراً، حدث خطأ أثناء إرسال الطلب. حاول مرة أخرى." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (successMessage) {

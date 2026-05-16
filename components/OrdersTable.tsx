@@ -12,8 +12,26 @@ export function OrdersTable() {
   const [query, setQuery] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/admin/orders");
+      if (!res.ok) throw new Error("Failed to fetch orders");
+      const data = await res.json();
+      setOrders(data);
+    } catch (err) {
+      setError("Failed to load orders from database.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    setOrders(loadOrders());
+    void fetchOrders();
   }, []);
 
   const filteredOrders = useMemo(() => {
@@ -29,10 +47,23 @@ export function OrdersTable() {
     );
   }, [orders, query]);
 
-  const handleStatusChange = (orderId: string, status: OrderStatus) => {
-    const nextOrders = updateOrderStatus(orderId, status);
-    setOrders(nextOrders);
-    setSelectedOrder(nextOrders.find((order) => order.id === orderId) || null);
+  const handleStatusChange = async (orderId: string, status: OrderStatus) => {
+    try {
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update status");
+
+      await fetchOrders();
+      if (selectedOrder?.id === orderId) {
+        setSelectedOrder((prev) => (prev ? { ...prev, status } : null));
+      }
+    } catch (err) {
+      alert("⚠️ فشل تحديث حالة الطلب في قاعدة البيانات.");
+    }
   };
 
   return (

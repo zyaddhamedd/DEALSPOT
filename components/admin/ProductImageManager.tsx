@@ -46,39 +46,45 @@ export function ProductImageManager({
     setIsConverting(true);
     setNotice({
       tone: "info",
-      message: `Converting ${files.length} image${files.length > 1 ? "s" : ""}...`,
+      message: `Uploading ${files.length} image${files.length > 1 ? "s" : ""}...`,
     });
 
     try {
-      const convertedImages: string[] = [];
+      const uploadedUrls: string[] = [];
 
       for (const file of files) {
         if (!file.type.startsWith("image/")) {
           throw new Error(`${file.name} is not a supported image file.`);
         }
 
-        convertedImages.push(await convertImageToWebP(file, 0.75, 1000));
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Upload failed");
+        }
+
+        const data = await res.json();
+        uploadedUrls.push(data.secure_url);
       }
 
-      const nextImages = [...product.images, ...convertedImages];
+      const nextImages = [...product.images, ...uploadedUrls];
       onImagesChange(nextImages);
 
-      const nextBytes = nextImages.reduce(
-        (total, image) => total + (isDataUrl(image) ? estimateDataUrlBytes(image) : 0),
-        0,
-      );
-
       setNotice({
-        tone: nextBytes > LOCAL_STORAGE_WARNING_BYTES ? "warning" : "success",
-        message:
-          nextBytes > LOCAL_STORAGE_WARNING_BYTES
-            ? "Images were added, but localStorage usage is getting large. This MVP may hit browser limits soon."
-            : `Added ${convertedImages.length} image${convertedImages.length > 1 ? "s" : ""}.`,
+        tone: "success",
+        message: `Successfully uploaded ${uploadedUrls.length} image${uploadedUrls.length > 1 ? "s" : ""}.`,
       });
     } catch (error) {
       setNotice({
         tone: "error",
-        message: error instanceof Error ? error.message : "Image conversion failed.",
+        message: error instanceof Error ? error.message : "Image upload failed.",
       });
     } finally {
       setIsConverting(false);

@@ -3,15 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ProductEditor } from "@/components/admin/ProductEditor";
 import { ProductList } from "@/components/admin/ProductList";
-import { defaultProducts } from "@/lib/products";
-import {
-  estimateProductsStorageBytes,
-  loadProducts,
-  resetProducts,
-  saveProducts,
-} from "@/lib/productStorage";
 import { Product } from "@/lib/types";
-import { formatFileSize } from "@/src/lib/imageCompression";
 
 const STORAGE_WARNING_THRESHOLD = 4.5 * 1024 * 1024;
 
@@ -19,16 +11,34 @@ const findProductById = (products: Product[], productId: string) =>
   products.find((product) => product.id === productId);
 
 export function ProductManager() {
-  const [products, setProducts] = useState<Product[]>(defaultProducts);
-  const [savedProducts, setSavedProducts] = useState<Product[]>(defaultProducts);
-  const [selectedProductId, setSelectedProductId] = useState(defaultProducts[0]?.id ?? "");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [savedProducts, setSavedProducts] = useState<Product[]>([]);
+  const [selectedProductId, setSelectedProductId] = useState("");
   const [toast, setToast] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/admin/products");
+      if (!res.ok) throw new Error("Failed to fetch products");
+      const data = await res.json();
+      setProducts(data);
+      setSavedProducts(data);
+      if (data.length > 0 && !selectedProductId) {
+        setSelectedProductId(data[0].id);
+      }
+    } catch (err) {
+      setError("Failed to load products from database.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const storedProducts = loadProducts();
-    setProducts(storedProducts);
-    setSavedProducts(storedProducts);
-    setSelectedProductId(storedProducts[0]?.id ?? "");
+    void fetchProducts();
   }, []);
 
   useEffect(() => {
@@ -58,11 +68,8 @@ export function ProductManager() {
     return JSON.stringify(selectedProduct) !== JSON.stringify(savedSelectedProduct);
   }, [savedSelectedProduct, selectedProduct]);
 
-  const storageBytes = useMemo(() => estimateProductsStorageBytes(products), [products]);
-  const storageWarning =
-    storageBytes > STORAGE_WARNING_THRESHOLD
-      ? `Total product data is around ${formatFileSize(storageBytes)}. Since this MVP stores images in localStorage, browser limits may be hit soon.`
-      : "";
+  // Storage warning no longer applies for DB/Cloudinary, but we keep the memo for UI compatibility if needed
+  const storageWarning = "";
 
   const updateProduct = (productId: string, updater: (product: Product) => Product) => {
     setProducts((current) =>
@@ -82,13 +89,32 @@ export function ProductManager() {
     }));
   };
 
-  const handleSave = () => {
-    const success = saveProducts(products);
-    if (success) {
-      setSavedProducts(products);
-      setToast("تم حفظ تعديلات المنتج بنجاح.");
-    } else {
-      setToast("⚠️ فشل الحفظ! مساحة التخزين في المتصفح ممتلئة. يرجى تقليل حجم الصور المرفوعة.");
+  const handleSave = async () => {
+    if (!selectedProduct) return;
+    
+    setIsLoading(true);
+    try {
+      const isNew = !savedSelectedProduct;
+      const url = isNew ? "/api/admin/products" : `/api/admin/products/${selectedProduct.id}`;
+      const method = isNew ? "POST" : "PUT";
+
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(selectedProduct),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Save failed");
+      }
+
+      await fetchProducts();
+      setToast("تم حفظ تعديلات المنتج في قاعدة البيانات بنجاح.");
+    } catch (err) {
+      setToast(`⚠️ فشل الحفظ! ${err instanceof Error ? err.message : "خطأ غير معروف"}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -97,7 +123,7 @@ export function ProductManager() {
       return;
     }
 
-    const fallback = findProductById(savedProducts, selectedProduct.id) ?? findProductById(defaultProducts, selectedProduct.id);
+    const fallback = findProductById(savedProducts, selectedProduct.id);
     if (!fallback) {
       return;
     }
@@ -107,9 +133,9 @@ export function ProductManager() {
   };
 
   const handleAddProduct = () => {
-    const newId = `prod-${Date.now()}`;
+    const tempId = `new-${Date.now()}`;
     const newProduct: Product = {
-      id: newId,
+      id: tempId,
       name: "New Product",
       slug: `new-product-${Date.now()}`,
       description: "Enter product description here...",
@@ -117,30 +143,18 @@ export function ProductManager() {
       salePrice: 0,
       images: [],
       sizes: ["37", "38", "39", "40", "41"],
-      active: true, // Make active by default so it shows up
+      active: true,
       featured: false,
       reviews: [],
       faq: []
     };
 
-    // Ensure we are working with the latest products state
-    setProducts((current) => {
-      const updated = [newProduct, ...current];
-      const success = saveProducts(updated);
-      
-      if (success) {
-        setSavedProducts(updated);
-        setSelectedProductId(newId);
-        setToast("تم إضافة منتج جديد بنجاح. ابدأ بتعديله الآن.");
-        return updated;
-      } else {
-        setToast("⚠️ فشل الإضافة! مساحة التخزين ممتلئة.");
-        return current;
-      }
-    });
+    setProducts((current) => [newProduct, ...current]);
+    setSelectedProductId(tempId);
+    setToast("منتج جديد جاهز للتعديل. اضغط 'Save Changes' لإضافته لقاعدة البيانات.");
   };
 
-  const handleDeleteProduct = (productId: string) => {
+  const handleDeleteProduct = async (productId: string) => {
     const productToDelete = findProductById(products, productId);
     if (!productToDelete) return;
 
@@ -148,30 +162,46 @@ export function ProductManager() {
       return;
     }
 
-    const updatedProducts = products.filter((p) => p.id !== productId);
-    
-    // If we deleted the selected one, pick another
-    if (selectedProductId === productId) {
-      setSelectedProductId(updatedProducts[0]?.id ?? "");
-    }
+    setIsLoading(true);
+    try {
+      // If it's a temp product not yet saved to DB
+      if (productId.startsWith("new-")) {
+        const updatedProducts = products.filter((p) => p.id !== productId);
+        setProducts(updatedProducts);
+        setSavedProducts(savedProducts.filter(p => p.id !== productId));
+        if (selectedProductId === productId) {
+          setSelectedProductId(updatedProducts[0]?.id ?? "");
+        }
+        return;
+      }
 
-    setProducts(updatedProducts);
-    saveProducts(updatedProducts);
-    setSavedProducts(updatedProducts);
-    setToast(`تم حذف المنتج "${productToDelete.name}" بنجاح.`);
+      const res = await fetch(`/api/admin/products/${productId}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error("Delete failed");
+
+      await fetchProducts();
+      setToast(`تم حذف المنتج "${productToDelete.name}" بنجاح.`);
+    } catch (err) {
+      setToast("⚠️ فشل الحذف من قاعدة البيانات.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleResetAll = () => {
-    if (!window.confirm("سيتم حذف كل التعديلات المحلية والرجوع للمنتجات الافتراضية. هل تريد المتابعة؟")) {
-      return;
-    }
-
-    const defaults = resetProducts();
-    setProducts(defaults);
-    setSavedProducts(defaults);
-    setSelectedProductId(defaults[0]?.id ?? "");
-    setToast("تمت إعادة كل المنتجات إلى القيم الافتراضية.");
+    setToast("⚠️ ميزة إعادة التعيين الكاملة تم إيقافها للأمان في نسخة الإنتاج.");
   };
+
+  if (error) {
+    return (
+      <div className="panel p-10 text-center">
+        <p className="text-red-400">{error}</p>
+        <button onClick={() => void fetchProducts()} className="btn-primary mt-4">Try Again</button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
@@ -184,9 +214,11 @@ export function ProductManager() {
               واجهة إدارة سريعة للمنتجات. اختار موديل من القائمة لتعديل بياناته أو صوره مباشرة.
             </p>
           </div>
-          <div className="rounded-full border border-white/10 bg-black/40 px-5 py-3 text-sm font-bold text-white/80">
-            Storage: {formatFileSize(storageBytes)}
-          </div>
+          {isLoading && (
+            <div className="rounded-full border border-white/10 bg-black/40 px-5 py-3 text-sm font-bold text-white/80 animate-pulse">
+              Syncing...
+            </div>
+          )}
         </div>
       </div>
 

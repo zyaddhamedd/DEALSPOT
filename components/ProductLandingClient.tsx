@@ -29,22 +29,42 @@ export function ProductLandingClient({ product }: ProductLandingClientProps) {
   const sizeRef = useRef<HTMLDivElement | null>(null);
   const colorRef = useRef<HTMLDivElement | null>(null);
 
-  // Sync with localStorage product data
+  // Sync with Database or localStorage product data
   useEffect(() => {
-    const storageProducts = loadProducts();
-    const decodedSlug = decodeURIComponent(product.slug);
-    
-    const storageProduct = storageProducts.find(
-      (item) => item.slug === decodedSlug || item.slug === product.slug,
-    );
-    
-    if (storageProduct) {
-      setCurrentProduct(storageProduct);
-      if (storageProduct.sizes.length > 0) setSelectedSize(storageProduct.sizes[0]);
-      if (storageProduct.colors && storageProduct.colors.length > 0) {
-        setSelectedColor(storageProduct.colors[0].name);
+    const syncData = async () => {
+      const decodedSlug = decodeURIComponent(product.slug);
+      
+      try {
+        const res = await fetch(`/api/products/${product.slug}`);
+        if (res.ok) {
+          const dbProduct = await res.json();
+          setCurrentProduct(dbProduct);
+          if (dbProduct.sizes.length > 0) setSelectedSize(dbProduct.sizes[0]);
+          if (dbProduct.colors && dbProduct.colors.length > 0) {
+            setSelectedColor(dbProduct.colors[0].name);
+          }
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to fetch product from DB:", err);
       }
-    }
+
+      // Fallback to localStorage if DB fetch fails or product not found
+      const storageProducts = loadProducts();
+      const storageProduct = storageProducts.find(
+        (item) => item.slug === decodedSlug || item.slug === product.slug,
+      );
+      
+      if (storageProduct) {
+        setCurrentProduct(storageProduct);
+        if (storageProduct.sizes.length > 0) setSelectedSize(storageProduct.sizes[0]);
+        if (storageProduct.colors && storageProduct.colors.length > 0) {
+          setSelectedColor(storageProduct.colors[0].name);
+        }
+      }
+    };
+
+    void syncData();
   }, [product.slug]);
 
   const imageGallery = useMemo(() => {
