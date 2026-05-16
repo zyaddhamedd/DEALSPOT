@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import FacebookPixel from "@/components/analytics/FacebookPixel";
 
 export const metadata: Metadata = {
   title: "DealSpot — اطلب دلوقتي والدفع عند الاستلام",
@@ -26,7 +27,10 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <FacebookPixel />
+        {children}
+      </body>
     </html>
   );
 }
