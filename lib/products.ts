@@ -49,9 +49,28 @@ export const normalizeProduct = (product: StoredProduct, fallback: Product): Pro
   faq: Array.isArray(product.faq) ? product.faq : cloneFaq(fallback),
 });
 
-export const resolveProductFallback = (product: Partial<Product>, index = 0) =>
-  defaultProducts.find((item) => item.id === product.id || item.slug === product.slug) ??
-  defaultProducts[index] ??
-  defaultProducts[0];
+export const resolveProductFallback = (product: Partial<Product>, index = 0): Product => {
+  const found = defaultProducts.find((item) => item.id === product.id || item.slug === product.slug);
+  if (found) return found;
+  
+  const fallbackFromList = defaultProducts[index] ?? defaultProducts[0];
+  if (fallbackFromList) return fallbackFromList;
+
+  // Ultimate fallback if defaultProducts is empty
+  return {
+    id: product.id || "temp-id",
+    slug: product.slug || "temp-slug",
+    name: product.name || "New Product",
+    description: "",
+    price: 0,
+    salePrice: 0,
+    images: [],
+    sizes: [],
+    active: false,
+    featured: false,
+    reviews: [],
+    faq: []
+  };
+};
 
 export { placeholderImageGuide };
