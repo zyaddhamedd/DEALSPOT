@@ -9,6 +9,11 @@ type ColorSelectorProps = {
 export function ColorSelector({ colors, selectedColor, onChange }: ColorSelectorProps) {
   if (!colors || colors.length === 0) return null;
 
+  const normalizeLabel = (label: string) => {
+    if (label === "Black/Red") return "BLACK";
+    return label;
+  };
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center justify-between">
@@ -16,7 +21,7 @@ export function ColorSelector({ colors, selectedColor, onChange }: ColorSelector
           اختار اللون
         </span>
         <span className="text-xs font-bold text-accent bg-accent/5 px-2 py-0.5 rounded-full">
-          {selectedColor || "لم يتم الاختيار"}
+          {normalizeLabel(selectedColor) || "لم يتم الاختيار"}
         </span>
       </div>
 
@@ -50,7 +55,7 @@ export function ColorSelector({ colors, selectedColor, onChange }: ColorSelector
                 )}
               </div>
               <span className={`text-[10px] font-bold uppercase transition-colors ${isActive ? "text-accent" : "text-gray-400"}`}>
-                {color.name}
+                {normalizeLabel(color.name)}
               </span>
             </button>
           );
