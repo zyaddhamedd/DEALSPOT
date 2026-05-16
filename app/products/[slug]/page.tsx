@@ -15,7 +15,12 @@ export function generateStaticParams() {
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
   
-  const decodedSlug = decodeURIComponent(slug);
+  let decodedSlug = slug;
+  try {
+    decodedSlug = decodeURIComponent(slug);
+  } catch (e) {
+    console.error("Failed to decode slug:", slug);
+  }
   
   // Find in default list for initial SSR/SEO
   const defaultProduct = defaultProducts.find((item) => item.slug === slug || item.slug === decodedSlug);

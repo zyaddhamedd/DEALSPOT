@@ -3,6 +3,7 @@
 import { ProductImageManager } from "@/components/admin/ProductImageManager";
 import { SizeManager } from "@/components/admin/SizeManager";
 import { ColorManager } from "@/components/admin/ColorManager";
+import { slugify } from "@/lib/utils";
 import { Product } from "@/lib/types";
 
 type ProductEditorProps = {
@@ -86,7 +87,7 @@ export function ProductEditor({
           <input
             className="field"
             value={product.slug}
-            onChange={(event) => onChange("slug", event.target.value)}
+            onChange={(event) => onChange("slug", slugify(event.target.value))}
             placeholder="e.g. weair-2-black-full"
           />
         </label>

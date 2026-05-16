@@ -23,5 +23,8 @@ export const isToday = (value: string) => {
 export const slugify = (value: string) =>
   value
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .trim()
+    .replace(/[^\u0600-\u06FF\u0750-\u077F\u08A0-\u08FFa-z0-9\s-]/g, "") // Remove weird symbols but keep Arabic, letters, numbers, spaces, hyphens
+    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/-+/g, "-") // Replace multiple hyphens with single one
+    .replace(/^-+|-+$/g, ""); // Trim hyphens from ends
