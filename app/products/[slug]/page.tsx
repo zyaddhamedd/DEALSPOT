@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { ProductLandingClient } from "@/components/ProductLandingClient";
-import { defaultProducts } from "@/lib/products";
+import { getProductBySlug } from "@/src/lib/server/products";
 
 export const dynamic = "force-dynamic";
 
@@ -21,22 +21,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
     // fallback to original slug
   }
   
-  // Find in default list for initial SEO
-  const defaultProduct = defaultProducts.find((item) => item.slug === slug || item.slug === decodedSlug);
+  // 1. Try to fetch from DB for Server Side Rendering (SSR)
+  const product = await getProductBySlug(decodedSlug);
 
-  // Return the client component. 
-  // It will handle the rest of the hydration from localStorage.
-  return <ProductLandingClient product={defaultProduct || {
-    id: "loading-" + slug.length,
-    slug: decodedSlug,
-    name: "...Loading",
-    description: "",
-    price: 0,
-    salePrice: 0,
-    images: [],
-    sizes: [],
-    active: true,
-    reviews: [],
-    faq: []
-  }} />;
+  if (!product) {
+    return notFound();
+  }
+
+  // Return the client component with fresh DB data
+  return <ProductLandingClient product={product} />;
 }
