@@ -17,16 +17,19 @@ const defaultFaqs: ProductFaq[] = [
     answer: "التوصيل بيتم في خلال 2 إلى 4 أيام عمل حسب محافظتك.",
   },
   {
+    question: "إزاي بتأكدوا الأوردر؟",
+    answer: "بعد ما بتسجل الأوردر، بنتواصل معاك على موبايلك لتأكيد البيانات قبل الشحن.",
+  },
+];
+
+const conversionFaqs: ProductFaq[] = [
+  {
     question: "إيه جودة الخامات؟",
     answer: "بنستخدم خامات ممتازة درجة أولى، بتضمنلك أعلى راحة وأطول عمر للمنتج مع الاستخدام.",
   },
   {
     question: "هل المنتج زي الصور؟",
     answer: "الصور حقيقية 100%، وليك الحق تعاين وتتأكد من كل حاجة بنفسك قبل ما تدفع مليم.",
-  },
-  {
-    question: "إزاي بتأكدوا الأوردر؟",
-    answer: "بعد ما بتسجل الأوردر، بنتواصل معاك على موبايلك لتأكيد البيانات قبل الشحن.",
   },
 ];
 
@@ -35,7 +38,18 @@ type ProductFAQProps = {
 };
 
 export function ProductFAQ({ items }: ProductFAQProps) {
-  const faqs = items && items.length > 0 ? items : defaultFaqs;
+  // Use items from DB if available, otherwise use defaults
+  const baseFaqs = items && items.length > 0 ? items : defaultFaqs;
+  
+  // Merge with conversion FAQs to ensure they always appear in production
+  // while avoiding duplicates if they are already in the DB
+  const faqs = [...baseFaqs];
+  conversionFaqs.forEach((cf) => {
+    if (!faqs.some((f) => f.question === cf.question)) {
+      faqs.push(cf);
+    }
+  });
+
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
