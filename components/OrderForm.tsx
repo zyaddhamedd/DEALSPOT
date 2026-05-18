@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createOrder } from "@/lib/storage";
 import { OrderPayload, Product } from "@/lib/types";
-import { trackMetaEvent } from "@/components/analytics/trackMetaEvent";
+import { trackMetaEvent, trackPurchaseEvent } from "@/components/analytics/trackMetaEvent";
 
 type OrderFormProps = {
   product: Product;
@@ -192,15 +192,28 @@ export function OrderForm({
         throw new Error(errorData.error || "Failed to place order in DB");
       }
 
+      const data = await res.json();
+      const orderId = data.orderId;
+
       // 2. Local Legacy Storage (for current admin view)
       createOrder(product, payload);
+
+      const total = product.salePrice * payload.quantity;
 
       // Track Lead event after successful order submission
       trackMetaEvent("Lead", {
         content_name: product.name,
         content_ids: [product.id],
-        value: product.salePrice,
+        value: total,
         currency: "EGP",
+      });
+
+      // Track Purchase event professionally using our reusable helper
+      trackPurchaseEvent({
+        order: { id: orderId },
+        product: { id: product.id, name: product.name },
+        quantity: payload.quantity,
+        total: total,
       });
 
       setSuccessMessage("تم تسجيل طلبك بنجاح، هنتواصل معاك لتأكيد الأوردر.");
