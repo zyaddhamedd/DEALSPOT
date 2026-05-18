@@ -163,7 +163,7 @@ export function FlyingJet() {
           left: 0,
           top: 0,
           transform: `translate3d(${position.x}vw, ${position.y}vh, 0) translate(-50%, -50%) rotate(${rotation}deg)`,
-          transition: `transform ${speed}ms cubic-bezier(0.4, 0.0, 0.2, 1)`,
+          transition: `transform ${speed}ms ${speed > 1000 ? "linear" : "cubic-bezier(0.25, 1, 0.5, 1)"}`,
           willChange: 'transform',
         }}
       >
