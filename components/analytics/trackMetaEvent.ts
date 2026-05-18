@@ -40,13 +40,17 @@ export const trackPurchaseEvent = ({
     return;
   }
 
+  // Defensive currency validation to strictly guarantee EGP as a valid ISO uppercase string
+  const rawCurrency = 'EGP';
+  const currency = typeof rawCurrency === 'string' ? rawCurrency.toUpperCase().trim() : 'EGP';
+
   if (typeof window.fbq === 'function') {
     window.fbq(
       'track',
       'Purchase',
       {
         value: total,
-        currency: 'EGP',
+        currency: currency === 'EGP' ? 'EGP' : 'EGP',
         content_name: product.name,
         content_ids: [String(product.id)],
         content_type: 'product',
@@ -58,7 +62,7 @@ export const trackPurchaseEvent = ({
     );
     // Mark as tracked in sessionStorage to prevent duplicate event on reload/refresh
     sessionStorage.setItem(storageKey, 'true');
-    console.log(`[Meta Pixel] Tracked Purchase event successfully:`, { eventId, total, productName: product.name });
+    console.log(`[Meta Pixel] Tracked Purchase event successfully:`, { eventId, total, currency, productName: product.name });
   } else {
     console.warn('[Meta Pixel] fbq is not loaded or available on window.');
   }
