@@ -42,45 +42,54 @@ export function ProductList({ products, selectedProductId, onSelect, onDelete, o
               <button
                 type="button"
                 onClick={() => onSelect(product.id)}
-                className={`flex w-full items-center gap-4 rounded-[1.5rem] border p-3 text-left transition ${
+                className={`flex w-full items-center gap-3 sm:gap-4 rounded-[1.5rem] border p-3 text-left transition ${
                   selected
                     ? "border-[#e11d2f] bg-[#e11d2f]/10 shadow-[0_0_20px_rgba(225,29,47,0.2)]"
                     : "border-white/10 bg-white/[0.04] hover:border-white/20 hover:bg-white/[0.08]"
                 }`}
               >
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-[1.1rem] border border-white/10 bg-black/40">
+                <div className="relative h-14 w-14 sm:h-16 sm:w-16 shrink-0 overflow-hidden rounded-xl sm:rounded-[1.1rem] border border-white/10 bg-black/40">
                   {heroImage ? (
                     <ProductMedia
                       src={heroImage}
                       alt={product.name}
                       fill
                       className="object-cover"
-                      sizes="64px"
+                      sizes="(max-width: 640px) 56px, 64px"
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center text-[11px] text-white/40">No image</div>
+                    <div className="flex h-full items-center justify-center text-[9px] sm:text-[11px] text-white/40">No image</div>
                   )}
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <p className="truncate text-sm font-bold text-white sm:text-base">{product.name}</p>
                     <span
-                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                      className={`rounded-full px-2 py-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider ${
                         product.active ? "bg-emerald-500/20 text-emerald-400" : "bg-white/10 text-white/40"
                       }`}
                     >
                       {product.active ? "Active" : "Inactive"}
                     </span>
                   </div>
-                  <p className="mt-1 truncate text-xs text-white/40">{product.slug}</p>
-                  <p className="mt-2 text-sm font-bold text-white">{formatPrice(product.salePrice)} ج.م</p>
+                  <p className="mt-0.5 sm:mt-1 truncate text-[11px] sm:text-xs text-white/40">{product.slug}</p>
+                  <p className="mt-1 sm:mt-2 text-xs sm:text-sm font-bold text-white">{formatPrice(product.salePrice)} ج.م</p>
                 </div>
 
-                <span className={`rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-tight transition ${
+                <span className={`hidden sm:inline-block rounded-full border px-3 py-2 text-[11px] font-bold uppercase tracking-tight transition ${
                   selected ? "border-accent bg-accent text-white" : "border-white/10 bg-white/5 text-white/60"
                 }`}>
                   {selected ? "Editing" : "Edit"}
+                </span>
+                
+                {/* Mobile selected indicator */}
+                <span className={`sm:hidden flex items-center justify-center w-6 h-6 rounded-full border transition ${
+                  selected ? "border-accent bg-accent text-white" : "border-white/10 bg-white/5 text-white/60"
+                }`}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    {selected ? <path d="M20 6L9 17l-5-5"/> : <path d="M9 18l6-6-6-6"/>}
+                  </svg>
                 </span>
               </button>
 
