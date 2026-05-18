@@ -522,3 +522,47 @@ details summary::-webkit-details-marker {
   margin: 1rem 0;
 }
 
+/* ——— Sci-Fi Airplane (Stealth Bomber) Animation ——— */
+@keyframes stealth-fly {
+  0% { 
+    transform: translate(-20vw, 120vh) rotate(35deg) scale(0.6); 
+    opacity: 0; 
+  }
+  15% { 
+    opacity: 0.6; 
+  }
+  50% { 
+    transform: translate(60vw, 40vh) rotate(45deg) scale(1.1); 
+    opacity: 1; 
+  }
+  85% { 
+    opacity: 0.6; 
+  }
+  100% { 
+    transform: translate(120vw, -30vh) rotate(55deg) scale(0.7); 
+    opacity: 0; 
+  }
+}
+
+.stealth-bomber {
+  position: absolute;
+  pointer-events: none;
+  animation: stealth-fly 22s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+}
+
+.engine-trail {
+  position: absolute;
+  bottom: -20px;
+  transform: translateX(-50%);
+  width: 3px;
+  height: 60px;
+  filter: blur(3px);
+  opacity: 0.8;
+  animation: engine-pulse 0.4s infinite alternate;
+}
+
+@keyframes engine-pulse {
+  from { opacity: 0.5; height: 40px; }
+  to { opacity: 1; height: 80px; }
+}
+
