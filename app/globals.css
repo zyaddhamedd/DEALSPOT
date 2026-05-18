@@ -569,30 +569,33 @@ details summary::-webkit-details-marker {
 /* ——— Realistic Smoke Particles ——— */
 .smoke-particle {
   position: fixed;
-  width: 14px;
-  height: 14px;
-  background: radial-gradient(circle, rgba(0, 243, 255, 0.9) 0%, rgba(200, 255, 255, 0.4) 40%, rgba(0, 243, 255, 0) 80%);
+  width: 18px;
+  height: 18px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(0, 243, 255, 0.8) 30%, rgba(0, 100, 255, 0.3) 60%, transparent 80%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 40;
-  transform: translate(-50%, -50%) scale(1);
-  opacity: 0.9;
-  animation: smoke-fade 1.2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
-  filter: blur(3px);
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 1;
+  animation: smoke-fade 1.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  filter: blur(4px);
   mix-blend-mode: screen;
 }
 
 @keyframes smoke-fade {
   0% {
     transform: translate(-50%, -50%) scale(0.5);
-    opacity: 0.9;
+    opacity: 1;
+    filter: blur(2px);
   }
-  50% {
-    opacity: 0.5;
+  30% {
+    opacity: 0.7;
+    filter: blur(6px);
   }
   100% {
-    transform: translate(-50%, -50%) scale(4.5);
+    transform: translate(-50%, -50%) scale(8);
     opacity: 0;
+    filter: blur(12px);
   }
 }
 

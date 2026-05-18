@@ -52,8 +52,14 @@ export function FlyingJet() {
               if (smoke.parentNode) {
                 smoke.parentNode.removeChild(smoke);
               }
-            }, 1200);
+            }, 1800);
           };
+
+          // Center Engine Smoke (for denser effect)
+          spawnParticle(
+            cx + rX * engineOffset,
+            cy + rY * engineOffset
+          );
 
           // Left Engine Smoke
           spawnParticle(
@@ -109,41 +115,46 @@ export function FlyingJet() {
     if (isPlayingRef.current) return;
     isPlayingRef.current = true;
 
-    // 1. Dart away fast and do a barrel roll (spin 360)
-    setSpeed(500);
-    const jump1X = 15 + Math.random() * 70;
-    const jump1Y = 15 + Math.random() * 70;
+    // 1. Dart to a bottom corner based on current position
+    setSpeed(600); // Fast dart
+    const isLeft = position.x < 50;
+    
+    // If on the left, fly to the right corner, and vice versa
+    const cornerX = isLeft ? 90 + Math.random() * 5 : 5 + Math.random() * 5;
+    const cornerY = 85 + Math.random() * 10; // Bottom corners
     
     setPosition((prev) => {
-      const angle1 = Math.atan2(jump1Y - prev.y, jump1X - prev.x) * (180 / Math.PI);
-      setRotation(angle1 + 90 + 360); // +360 for a joyful spin!
-      return { x: jump1X, y: jump1Y };
+      const angle1 = Math.atan2(cornerY - prev.y, cornerX - prev.x) * (180 / Math.PI);
+      setRotation(angle1 + 90); 
+      return { x: cornerX, y: cornerY };
     });
 
-    // 2. Second quick jump
+    // 2. Bounce off the corner and fly to the top edge
     setTimeout(() => {
-      setSpeed(600);
-      const jump2X = 15 + Math.random() * 70;
-      const jump2Y = 15 + Math.random() * 70;
+      setSpeed(600); // Another fast dart
+      const topX = isLeft ? 15 + Math.random() * 10 : 75 + Math.random() * 10; // Opposite top side
+      const topY = 5 + Math.random() * 5; // Top edge
       
       setPosition((prev) => {
-        const angle2 = Math.atan2(jump2Y - prev.y, jump2X - prev.x) * (180 / Math.PI);
-        setRotation(angle2 + 90 - 360); // Spin the other way!
-        return { x: jump2X, y: jump2Y };
+        const angle2 = Math.atan2(topY - prev.y, topX - prev.x) * (180 / Math.PI);
+        // Spin while flying to the top!
+        setRotation(angle2 + 90 + (isLeft ? -360 : 360)); 
+        return { x: topX, y: topY };
       });
       
-      // 3. Back to idle
+      // 3. Bounce off the top and resume normal flight inside screen
       setTimeout(() => {
         isPlayingRef.current = false;
-        const targetX = 15 + Math.random() * 70;
-        const targetY = 15 + Math.random() * 70;
-        setSpeed(10000);
+        setSpeed(10000); // Back to relaxed flight speed
+        const targetX = 50 + (Math.random() * 20 - 10);
+        const targetY = 50 + (Math.random() * 20 - 10);
+        
         setPosition((prev) => {
           const angle3 = Math.atan2(targetY - prev.y, targetX - prev.x) * (180 / Math.PI);
           setRotation(angle3 + 90);
           return { x: targetX, y: targetY };
         });
-      }, 700);
+      }, 650);
 
     }, 600);
   };
