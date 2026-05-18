@@ -49,7 +49,7 @@ export const trackPurchaseEvent = ({
       'track',
       'Purchase',
       {
-        value: total,
+        value: Number(total),
         currency: currency === 'EGP' ? 'EGP' : 'EGP',
         content_name: product.name,
         content_ids: [String(product.id)],
@@ -62,7 +62,7 @@ export const trackPurchaseEvent = ({
     );
     // Mark as tracked in sessionStorage to prevent duplicate event on reload/refresh
     sessionStorage.setItem(storageKey, 'true');
-    console.log(`[Meta Pixel] Tracked Purchase event successfully:`, { eventId, total, currency, productName: product.name });
+    console.log(`[Meta Pixel] Tracked Purchase event successfully:`, { eventId, total: Number(total), currency, productName: product.name });
   } else {
     console.warn('[Meta Pixel] fbq is not loaded or available on window.');
   }

@@ -1,5 +1,5 @@
 export const formatPrice = (price: number) =>
-  new Intl.NumberFormat("ar-EG", {
+  new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 0,
   }).format(price);
 
