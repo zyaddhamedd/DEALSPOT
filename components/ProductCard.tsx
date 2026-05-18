@@ -28,9 +28,15 @@ export function ProductCard({ product }: ProductCardProps) {
         <p className="text-sm leading-7 text-white/72">{product.description}</p>
 
         <div className="flex items-end justify-between gap-4">
-          <div>
-            <p className="text-xs text-white/45 line-through">{formatPrice(product.price)} ج.م</p>
-            <p className="text-xl font-semibold text-white">{formatPrice(product.salePrice)} ج.م</p>
+          <div style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
+            <p className="text-xs text-white/45 line-through">
+              {formatPrice(product.price)}
+              <span style={{ fontFamily: "'Cairo', sans-serif", marginRight: 4 }}> ج.م</span>
+            </p>
+            <p className="text-xl font-semibold text-white">
+              {formatPrice(product.salePrice)}
+              <span style={{ fontFamily: "'Cairo', sans-serif", marginRight: 4 }}> ج.م</span>
+            </p>
           </div>
 
           <Link href={`/products/${product.slug}`} className="btn-secondary">

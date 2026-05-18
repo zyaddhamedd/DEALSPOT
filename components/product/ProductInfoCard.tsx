@@ -152,7 +152,7 @@ export function ProductInfoCard({
             >
               <span
                 style={{
-                  fontFamily: "'Cairo', sans-serif",
+                  fontFamily: "system-ui, -apple-system, sans-serif",
                   fontSize: 30,
                   fontWeight: 900,
                   color: "#111",
@@ -160,26 +160,27 @@ export function ProductInfoCard({
                 }}
               >
                 {formatPrice(salePrice)}
-                <span style={{ fontSize: 16, fontWeight: 700, marginRight: 4, color: "#374151" }}> ج.م</span>
+                <span style={{ fontFamily: "'Cairo', sans-serif", fontSize: 16, fontWeight: 700, marginRight: 4, color: "#374151" }}> ج.م</span>
               </span>
 
               {price > salePrice && (
                 <span
                   style={{
-                    fontFamily: "'Cairo', sans-serif",
+                    fontFamily: "system-ui, -apple-system, sans-serif",
                     fontSize: 15,
                     color: "#9ca3af",
                     textDecoration: "line-through",
                   }}
                 >
-                  {formatPrice(price)} ج.م
+                  {formatPrice(price)}
+                  <span style={{ fontFamily: "'Cairo', sans-serif", marginRight: 4 }}> ج.م</span>
                 </span>
               )}
 
               {savePct > 0 && (
                 <span
                   style={{
-                    fontFamily: "'Cairo', sans-serif",
+                    fontFamily: "system-ui, -apple-system, sans-serif",
                     fontSize: 11,
                     fontWeight: 800,
                     color: "white",
@@ -188,7 +189,8 @@ export function ProductInfoCard({
                     padding: "3px 10px",
                   }}
                 >
-                  وفّر {savePct}%
+                  <span style={{ fontFamily: "'Cairo', sans-serif" }}>وفّر </span>
+                  {savePct}%
                 </span>
               )}
             </div>

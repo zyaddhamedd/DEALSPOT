@@ -49,9 +49,15 @@ export function ProductHero({
             <p className="max-w-xl text-base leading-8 text-white/72 sm:text-lg">{product.description}</p>
 
             <div className="flex items-end gap-4">
-              <div>
-                <p className="text-sm text-white/40 line-through">{formatPrice(product.price)} ج.م</p>
-                <p className="text-3xl font-semibold text-white">{formatPrice(product.salePrice)} ج.م</p>
+              <div style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>
+                <p className="text-sm text-white/40 line-through">
+                  {formatPrice(product.price)}
+                  <span style={{ fontFamily: "'Cairo', sans-serif", marginRight: 4 }}> ج.م</span>
+                </p>
+                <p className="text-3xl font-semibold text-white">
+                  {formatPrice(product.salePrice)}
+                  <span style={{ fontFamily: "'Cairo', sans-serif", marginRight: 4 }}> ج.م</span>
+                </p>
               </div>
               <p className="max-w-xs text-sm leading-6 text-white/62">{product.accent}</p>
             </div>

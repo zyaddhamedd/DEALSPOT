@@ -35,7 +35,7 @@ export function StickyOrderCTA({ price, onClick }: StickyOrderCTAProps) {
           <div style={{ display: "flex", alignItems: "baseline", gap: 3 }}>
             <span
               style={{
-                fontFamily: "'Cairo', sans-serif",
+                fontFamily: "system-ui, -apple-system, sans-serif",
                 fontSize: 20,
                 fontWeight: 900,
                 color: "#111",

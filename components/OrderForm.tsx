@@ -198,7 +198,8 @@ export function OrderForm({
       // 2. Local Legacy Storage (for current admin view)
       createOrder(product, payload);
 
-      const total = product.salePrice * payload.quantity;
+      const salePriceNum = Number(product.salePrice);
+      const total = (isNaN(salePriceNum) ? 0 : salePriceNum) * (Number(payload.quantity) || 1);
 
       // Track Lead event after successful order submission
       trackMetaEvent("Lead", {
