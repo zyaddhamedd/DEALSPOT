@@ -4,7 +4,7 @@ type AdminStatCardProps = {
   label: string;
   value: string;
   helper: string;
-  glowColor?: "cyan" | "amber" | "green" | "red" | "purple";
+  glowColor?: "cyan" | "amber" | "green" | "red" | "purple" | "blue";
   pulse?: boolean;
 };
 
