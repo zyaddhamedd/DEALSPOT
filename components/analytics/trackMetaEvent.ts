@@ -40,14 +40,14 @@ export const trackPurchaseEvent = ({
     return;
   }
 
-  const currency = "EGP";
+  const currency = "EGP".trim().toUpperCase();
 
   if (typeof window.fbq === "function") {
     window.fbq(
       "track",
       "Purchase",
       {
-        value: Number(total),
+        value: total,
         currency: "EGP",
         content_name: product.name,
         content_ids: [String(product.id)],
@@ -60,7 +60,7 @@ export const trackPurchaseEvent = ({
     );
     // Mark as tracked in sessionStorage to prevent duplicate event on reload/refresh
     sessionStorage.setItem(storageKey, "true");
-    console.log(`[Meta Pixel] Tracked Purchase event successfully:`, { eventId, total: Number(total), currency: "EGP", productName: product.name });
+    console.log(`[Meta Pixel] Tracked Purchase event successfully:`, { eventId, total, currency: "EGP", productName: product.name });
   } else {
     console.warn('[Meta Pixel] fbq is not loaded or available on window.');
   }
