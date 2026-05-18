@@ -8,7 +8,76 @@ export function FlyingJet() {
   const [rotation, setRotation] = useState(90);
   const [speed, setSpeed] = useState(15000);
   const isPlayingRef = useRef(false);
+  const jetRef = useRef<HTMLDivElement>(null);
+  const smokeContainerRef = useRef<HTMLDivElement>(null);
+  const rotationRef = useRef(rotation);
 
+  useEffect(() => {
+    rotationRef.current = rotation;
+  }, [rotation]);
+
+  // Real-time smoke particle emitter
+  useEffect(() => {
+    let animationFrame: number;
+    let lastEmit = 0;
+
+    const emitSmoke = (timestamp: number) => {
+      if (timestamp - lastEmit > 35) { // Emit every 35ms for dense smoke
+        if (jetRef.current && smokeContainerRef.current) {
+          const rect = jetRef.current.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+
+          const rad = rotationRef.current * (Math.PI / 180);
+          const rX = -Math.sin(rad); // Rear direction X
+          const rY = Math.cos(rad);  // Rear direction Y
+          const rightX = Math.cos(rad); // Right direction X
+          const rightY = Math.sin(rad); // Right direction Y
+
+          // Offsets based on the jet's actual size to match the engines
+          const engineOffset = rect.height * 0.35; // 35% back from center
+          const sideOffset = rect.width * 0.12;    // 12% to the sides
+
+          const spawnParticle = (offsetX: number, offsetY: number) => {
+            const smoke = document.createElement("div");
+            smoke.className = "smoke-particle";
+            // Slight random scatter for realism
+            const scatterX = (Math.random() - 0.5) * 10;
+            const scatterY = (Math.random() - 0.5) * 10;
+            smoke.style.left = `${offsetX + scatterX}px`;
+            smoke.style.top = `${offsetY + scatterY}px`;
+            smokeContainerRef.current?.appendChild(smoke);
+            
+            setTimeout(() => {
+              if (smoke.parentNode) {
+                smoke.parentNode.removeChild(smoke);
+              }
+            }, 1200);
+          };
+
+          // Left Engine Smoke
+          spawnParticle(
+            cx + rX * engineOffset - rightX * sideOffset,
+            cy + rY * engineOffset - rightY * sideOffset
+          );
+
+          // Right Engine Smoke
+          spawnParticle(
+            cx + rX * engineOffset + rightX * sideOffset,
+            cy + rY * engineOffset + rightY * sideOffset
+          );
+
+          lastEmit = timestamp;
+        }
+      }
+      animationFrame = requestAnimationFrame(emitSmoke);
+    };
+
+    animationFrame = requestAnimationFrame(emitSmoke);
+    return () => cancelAnimationFrame(animationFrame);
+  }, []);
+
+  // Idle flight logic
   useEffect(() => {
     let timeout: NodeJS.Timeout;
 
@@ -22,7 +91,6 @@ export function FlyingJet() {
       
       setPosition((prev) => {
         const angle = Math.atan2(targetY - prev.y, targetX - prev.x) * (180 / Math.PI);
-        // Make sure the plane doesn't snap rotation awkwardly, but this simple math works for now
         setRotation(angle + 90);
         return { x: targetX, y: targetY };
       });
@@ -67,7 +135,6 @@ export function FlyingJet() {
       // 3. Back to idle
       setTimeout(() => {
         isPlayingRef.current = false;
-        // Trigger idle immediately
         const targetX = 15 + Math.random() * 70;
         const targetY = 15 + Math.random() * 70;
         setSpeed(10000);
@@ -82,28 +149,32 @@ export function FlyingJet() {
   };
 
   return (
-    <div
-      onMouseEnter={handlePlay}
-      className="fixed z-50 cursor-crosshair pointer-events-auto group"
-      style={{
-        left: `${position.x}vw`,
-        top: `${position.y}vh`,
-        transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
-        transition: `left ${speed}ms linear, top ${speed}ms linear, transform ${speed > 1000 ? 2000 : 300}ms ease-out`,
-      }}
-    >
-      <div className="relative">
-        <Image
-          src="/sci_fi_jet_transparent.png"
-          alt="Sci-Fi Jet"
-          width={400}
-          height={400}
-          className="w-48 h-48 md:w-64 md:h-64 object-contain opacity-90 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(0,243,255,0.6)]"
-          priority
-        />
-        {/* Glow behind the jet */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 md:w-40 md:h-40 bg-cyan-400/20 blur-2xl pointer-events-none rounded-full"></div>
+    <>
+      <div ref={smokeContainerRef} className="fixed inset-0 pointer-events-none z-40 overflow-hidden" />
+      <div
+        ref={jetRef}
+        onMouseEnter={handlePlay}
+        className="fixed z-50 cursor-crosshair pointer-events-auto group"
+        style={{
+          left: `${position.x}vw`,
+          top: `${position.y}vh`,
+          transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
+          transition: `left ${speed}ms linear, top ${speed}ms linear, transform ${speed > 1000 ? 2000 : 300}ms ease-out`,
+        }}
+      >
+        <div className="relative">
+          <Image
+            src="/sci_fi_jet_transparent.png"
+            alt="Sci-Fi Jet"
+            width={400}
+            height={400}
+            className="w-48 h-48 md:w-64 md:h-64 object-contain opacity-90 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(0,243,255,0.6)]"
+            priority
+          />
+          {/* Glow behind the jet */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 md:w-40 md:h-40 bg-cyan-400/20 blur-2xl pointer-events-none rounded-full"></div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

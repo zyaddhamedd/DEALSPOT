@@ -566,3 +566,33 @@ details summary::-webkit-details-marker {
   to { opacity: 1; height: 80px; }
 }
 
+/* ——— Realistic Smoke Particles ——— */
+.smoke-particle {
+  position: fixed;
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle, rgba(0, 243, 255, 0.9) 0%, rgba(200, 255, 255, 0.4) 40%, rgba(0, 243, 255, 0) 80%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 40;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0.9;
+  animation: smoke-fade 1.2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+  filter: blur(3px);
+  mix-blend-mode: screen;
+}
+
+@keyframes smoke-fade {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4.5);
+    opacity: 0;
+  }
+}
+
