@@ -29,16 +29,17 @@ export function FlyingJet() {
 
     reset();
     const interval = setInterval(() => {
-      if (!isPlayingRef.current && position.x > 110) {
+      if (!isPlayingRef.current) {
+        // Just let it keep resetting itself randomly if it's not being played with
         reset();
       }
-    }, 5000);
+    }, 25000); // restart the flight every 25s
 
     return () => {
       clearInterval(interval);
       clearTimeout(timeout);
     };
-  }, [position.x]);
+  }, []);
 
   const handlePlay = () => {
     if (isPlayingRef.current) return;
