@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { createOrder } from "@/lib/storage";
 import { OrderPayload, Product } from "@/lib/types";
 import { trackMetaEvent } from "@/components/analytics/trackMetaEvent";
@@ -104,6 +104,20 @@ export function OrderForm({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+
+  // Sync selectedSize prop with local form state
+  useEffect(() => {
+    if (selectedSize) {
+      setForm((prev) => ({ ...prev, size: selectedSize }));
+    }
+  }, [selectedSize]);
+
+  // Sync selectedColor prop with local form state
+  useEffect(() => {
+    if (selectedColor) {
+      setForm((prev) => ({ ...prev, color: selectedColor }));
+    }
+  }, [selectedColor]);
 
   const selectedSizeValue = useMemo(
     () => selectedSize || form.size || product.sizes[0] || "",
