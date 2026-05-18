@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { clearAdminSession } from "@/lib/adminAuth";
+import { FlyingJet } from "@/components/FlyingJet";
 
 const adminLinks = [
   { href: "/admin", label: "Dashboard" },
@@ -27,32 +28,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="admin-dark min-h-screen cockpit-bg text-white font-sans selection:bg-cyan-500/30 relative overflow-hidden">
       
-      {/* --- Sci-Fi Stealth Bomber / Airplane Animation --- */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {/* Main Bomber */}
-        <div className="stealth-bomber drop-shadow-[0_0_25px_var(--cockpit-cyan)] text-cyan-400">
-          <div className="relative">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round" className="w-32 h-32 md:w-48 md:h-48">
-              <polygon points="12 2 2 22 12 17 22 22 12 2" fill="currentColor" fillOpacity="0.15"/>
-              <polygon points="12 2 12 17 22 22 12 2" fill="currentColor" fillOpacity="0.4"/>
-            </svg>
-            <div className="engine-trail bg-gradient-to-t from-transparent to-cyan-400" style={{ left: '35%' }}></div>
-            <div className="engine-trail bg-gradient-to-t from-transparent to-cyan-400" style={{ left: '65%' }}></div>
-          </div>
-        </div>
-        
-        {/* Secondary distant Bomber */}
-        <div className="stealth-bomber drop-shadow-[0_0_15px_var(--cockpit-purple)] text-purple-500" style={{ animationDelay: '-12s', animationDuration: '30s' }}>
-          <div className="relative scale-50 opacity-60">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round" strokeLinejoin="round" className="w-32 h-32">
-              <polygon points="12 2 2 22 12 17 22 22 12 2" fill="currentColor" fillOpacity="0.15"/>
-              <polygon points="12 2 12 17 22 22 12 2" fill="currentColor" fillOpacity="0.4"/>
-            </svg>
-            <div className="engine-trail bg-gradient-to-t from-transparent to-purple-500" style={{ left: '35%' }}></div>
-            <div className="engine-trail bg-gradient-to-t from-transparent to-purple-500" style={{ left: '65%' }}></div>
-          </div>
-        </div>
-      </div>
+      {/* --- Sci-Fi Interactive Jet --- */}
+      <FlyingJet />
 
       <div className="container-shell py-6 lg:py-8 relative z-10">
         <div className="grid gap-6 lg:grid-cols-[17.5rem_minmax(0,1fr)]">
