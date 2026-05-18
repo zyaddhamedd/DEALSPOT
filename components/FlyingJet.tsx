@@ -22,7 +22,7 @@ export function FlyingJet() {
     let lastEmit = 0;
 
     const emitSmoke = (timestamp: number) => {
-      if (timestamp - lastEmit > 35) { // Emit every 35ms for dense smoke
+      if (timestamp - lastEmit > (isPlayingRef.current ? 20 : 45)) { // Faster emit during boost
         if (jetRef.current && smokeContainerRef.current) {
           const rect = jetRef.current.getBoundingClientRect();
           const cx = rect.left + rect.width / 2;
@@ -40,10 +40,10 @@ export function FlyingJet() {
 
           const spawnParticle = (offsetX: number, offsetY: number) => {
             const smoke = document.createElement("div");
-            smoke.className = "smoke-particle";
+            smoke.className = `smoke-particle${isPlayingRef.current ? ' smoke-fire' : ''}`;
             // Slight random scatter for realism
-            const scatterX = (Math.random() - 0.5) * 10;
-            const scatterY = (Math.random() - 0.5) * 10;
+            const scatterX = (Math.random() - 0.5) * 8;
+            const scatterY = (Math.random() - 0.5) * 8;
             smoke.style.left = `${offsetX + scatterX}px`;
             smoke.style.top = `${offsetY + scatterY}px`;
             smokeContainerRef.current?.appendChild(smoke);
@@ -52,14 +52,8 @@ export function FlyingJet() {
               if (smoke.parentNode) {
                 smoke.parentNode.removeChild(smoke);
               }
-            }, 1800);
+            }, isPlayingRef.current ? 800 : 1500);
           };
-
-          // Center Engine Smoke (for denser effect)
-          spawnParticle(
-            cx + rX * engineOffset,
-            cy + rY * engineOffset
-          );
 
           // Left Engine Smoke
           spawnParticle(
@@ -115,37 +109,36 @@ export function FlyingJet() {
     if (isPlayingRef.current) return;
     isPlayingRef.current = true;
 
-    // 1. Dart to a bottom corner based on current position
-    setSpeed(600); // Fast dart
-    const isLeft = position.x < 50;
+    // 1. Shoot like a rocket to the bottom of the screen!
+    setSpeed(350); // Super fast dart
     
-    // If on the left, fly to the right corner, and vice versa
-    const cornerX = isLeft ? 90 + Math.random() * 5 : 5 + Math.random() * 5;
-    const cornerY = 85 + Math.random() * 10; // Bottom corners
+    // Slight angle downwards
+    const hitX1 = position.x + (Math.random() * 20 - 10); 
+    const hitY1 = 98; // Bottom edge
     
     setPosition((prev) => {
-      const angle1 = Math.atan2(cornerY - prev.y, cornerX - prev.x) * (180 / Math.PI);
+      const angle1 = Math.atan2(hitY1 - prev.y, hitX1 - prev.x) * (180 / Math.PI);
       setRotation(angle1 + 90); 
-      return { x: cornerX, y: cornerY };
+      return { x: hitX1, y: hitY1 };
     });
 
-    // 2. Bounce off the corner and fly to the top edge
+    // 2. Bounce off the bottom and fly up
     setTimeout(() => {
-      setSpeed(600); // Another fast dart
-      const topX = isLeft ? 15 + Math.random() * 10 : 75 + Math.random() * 10; // Opposite top side
+      setSpeed(650); // Another fast dart
+      const topX = hitX1 > 50 ? 20 + Math.random() * 10 : 70 + Math.random() * 10; // Opposite top side
       const topY = 5 + Math.random() * 5; // Top edge
       
       setPosition((prev) => {
         const angle2 = Math.atan2(topY - prev.y, topX - prev.x) * (180 / Math.PI);
-        // Spin while flying to the top!
-        setRotation(angle2 + 90 + (isLeft ? -360 : 360)); 
+        // Spin while flying up!
+        setRotation(angle2 + 90 + (Math.random() > 0.5 ? -360 : 360)); 
         return { x: topX, y: topY };
       });
       
       // 3. Bounce off the top and resume normal flight inside screen
       setTimeout(() => {
         isPlayingRef.current = false;
-        setSpeed(10000); // Back to relaxed flight speed
+        setSpeed(12000); // Back to super smooth relaxed flight speed
         const targetX = 50 + (Math.random() * 20 - 10);
         const targetY = 50 + (Math.random() * 20 - 10);
         
@@ -154,9 +147,9 @@ export function FlyingJet() {
           setRotation(angle3 + 90);
           return { x: targetX, y: targetY };
         });
-      }, 650);
+      }, 700);
 
-    }, 600);
+    }, 400); // Small pause at the bottom
   };
 
   return (
@@ -170,7 +163,7 @@ export function FlyingJet() {
           left: `${position.x}vw`,
           top: `${position.y}vh`,
           transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
-          transition: `left ${speed}ms linear, top ${speed}ms linear, transform ${speed > 1000 ? 2000 : 300}ms ease-out`,
+          transition: `left ${speed}ms cubic-bezier(0.25, 0.1, 0.25, 1), top ${speed}ms cubic-bezier(0.25, 0.1, 0.25, 1), transform ${speed > 1000 ? 1500 : 350}ms ease-out`,
         }}
       >
         <div className="relative">
