@@ -160,10 +160,11 @@ export function FlyingJet() {
         onMouseEnter={handlePlay}
         className="fixed z-50 cursor-crosshair pointer-events-auto group"
         style={{
-          left: `${position.x}vw`,
-          top: `${position.y}vh`,
-          transform: `translate(-50%, -50%) rotate(${rotation}deg)`,
-          transition: `left ${speed}ms cubic-bezier(0.25, 0.1, 0.25, 1), top ${speed}ms cubic-bezier(0.25, 0.1, 0.25, 1), transform ${speed > 1000 ? 1500 : 350}ms ease-out`,
+          left: 0,
+          top: 0,
+          transform: `translate3d(${position.x}vw, ${position.y}vh, 0) translate(-50%, -50%) rotate(${rotation}deg)`,
+          transition: `transform ${speed}ms cubic-bezier(0.4, 0.0, 0.2, 1)`,
+          willChange: 'transform',
         }}
       >
         <div className="relative">
