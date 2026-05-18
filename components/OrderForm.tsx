@@ -97,7 +97,7 @@ export function OrderForm({
     governorate: "",
     address: "",
     size: selectedSize || product.sizes[0] || "",
-    color: selectedColor || product.colors?.[0]?.name || "",
+    color: selectedColor || "",
     quantity: 1,
     notes: "",
   });
@@ -125,8 +125,8 @@ export function OrderForm({
   );
 
   const selectedColorValue = useMemo(
-    () => selectedColor || form.color || product.colors?.[0]?.name || "",
-    [form.color, product.colors, selectedColor],
+    () => selectedColor || form.color || "",
+    [form.color, selectedColor],
   );
 
   const validate = () => {

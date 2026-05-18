@@ -23,7 +23,7 @@ type ProductLandingClientProps = {
 export function ProductLandingClient({ product }: ProductLandingClientProps) {
   const [currentProduct, setCurrentProduct] = useState(product);
   const [selectedSize, setSelectedSize] = useState(product.sizes[0] || "");
-  const [selectedColor, setSelectedColor] = useState(product.colors?.[0]?.name || "");
+  const [selectedColor, setSelectedColor] = useState("");
   const [sizeError, setSizeError] = useState(false);
   const [colorError, setColorError] = useState(false);
   const orderRef = useRef<HTMLDivElement | null>(null);
@@ -57,9 +57,6 @@ export function ProductLandingClient({ product }: ProductLandingClientProps) {
           const dbProduct = await res.json();
           setCurrentProduct(dbProduct);
           if (dbProduct.sizes.length > 0) setSelectedSize(dbProduct.sizes[0]);
-          if (dbProduct.colors && dbProduct.colors.length > 0) {
-            setSelectedColor(dbProduct.colors[0].name);
-          }
           return;
         }
       } catch (err) {
@@ -75,9 +72,6 @@ export function ProductLandingClient({ product }: ProductLandingClientProps) {
       if (storageProduct) {
         setCurrentProduct(storageProduct);
         if (storageProduct.sizes.length > 0) setSelectedSize(storageProduct.sizes[0]);
-        if (storageProduct.colors && storageProduct.colors.length > 0) {
-          setSelectedColor(storageProduct.colors[0].name);
-        }
       }
     };
 
@@ -177,6 +171,7 @@ export function ProductLandingClient({ product }: ProductLandingClientProps) {
                 setSelectedColor(color);
                 setColorError(false);
               }}
+              hasError={colorError}
             />
           </section>
 
