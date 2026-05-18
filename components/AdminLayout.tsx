@@ -34,13 +34,13 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       <div className="container-shell py-6 lg:py-8 relative z-10">
         <div className="grid gap-6 lg:grid-cols-[17.5rem_minmax(0,1fr)]">
           <aside className="cockpit-panel p-6 lg:sticky lg:top-6 lg:h-fit">
-            <div className="border-b border-cyan-500/20 pb-5">
-              <p className="text-[10px] uppercase tracking-[0.3em] cockpit-neon-cyan mb-1">System Core</p>
-              <h1 className="text-3xl font-bold cockpit-digital-font cockpit-neon-cyan cockpit-text-glow">DEALSPOT<br/>ADMIN</h1>
-              <p className="mt-3 text-[11px] font-mono text-white/50 uppercase tracking-wider">Protected internal dashboard.</p>
+            <div className="border-b border-cyan-500/20 pb-4 sm:pb-5">
+              <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] cockpit-neon-cyan mb-1">System Core</p>
+              <h1 className="text-2xl sm:text-3xl font-bold cockpit-digital-font cockpit-neon-cyan cockpit-text-glow">DEALSPOT<br/>ADMIN</h1>
+              <p className="mt-2 sm:mt-3 text-[10px] sm:text-[11px] font-mono text-white/50 uppercase tracking-wider">Protected internal dashboard.</p>
             </div>
 
-            <nav className="mt-6 space-y-2">
+            <nav className="mt-4 sm:mt-6 flex flex-row lg:flex-col gap-2 overflow-x-auto hide-scrollbar pb-2 lg:pb-0">
               {adminLinks.map((link) => {
                 const isActive = pathname === link.href;
 
@@ -48,14 +48,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`flex items-center justify-between px-4 py-3 text-sm font-mono tracking-widest uppercase transition-all duration-300 border-l-2 ${
+                    className={`flex items-center justify-between min-w-[130px] lg:min-w-0 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-mono tracking-widest uppercase transition-all duration-300 border-b-2 lg:border-b-0 lg:border-l-2 ${
                       isActive
-                        ? "border-cyan-400 bg-cyan-950/40 text-cyan-400 shadow-[inset_4px_0_10px_rgba(0,243,255,0.1)] cockpit-text-glow"
+                        ? "border-cyan-400 bg-cyan-950/40 text-cyan-400 shadow-[inset_0_-4px_10px_rgba(0,243,255,0.05)] lg:shadow-[inset_4px_0_10px_rgba(0,243,255,0.1)] cockpit-text-glow"
                         : "border-transparent text-white/40 hover:text-cyan-200 hover:bg-white/5 hover:border-cyan-400/30"
                     }`}
                   >
                     <span>{link.label}</span>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       <span className="text-[10px] opacity-70">[{isActive ? "ON" : "OFF"}]</span>
                       {isActive && <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-blink shadow-[0_0_8px_var(--cockpit-cyan)]"></div>}
                     </div>
@@ -71,16 +71,16 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           </aside>
 
           <div className="space-y-6">
-            <div className="cockpit-panel p-6">
+            <div className="cockpit-panel p-4 sm:p-6">
               <div className="radar-scan hidden md:block opacity-[0.15]"></div>
               <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-blink shadow-[0_0_10px_var(--cockpit-amber)]"></div>
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-amber-400 font-mono">Control Panel / Main</p>
+                  <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                    <div className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-amber-400 animate-blink shadow-[0_0_10px_var(--cockpit-amber)]"></div>
+                    <p className="text-[9px] sm:text-[10px] uppercase tracking-[0.3em] text-amber-400 font-mono">Control Panel / Main</p>
                   </div>
-                  <h2 className="text-2xl font-bold text-white cockpit-digital-font tracking-wide">COMMAND CENTER</h2>
-                  <p className="mt-2 text-[11px] font-mono text-white/50 max-w-xl leading-relaxed uppercase">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white cockpit-digital-font tracking-wide">COMMAND CENTER</h2>
+                  <p className="mt-1 sm:mt-2 text-[10px] sm:text-[11px] font-mono text-white/50 max-w-xl leading-relaxed uppercase">
                     System active. Secure client-side protection enabled. Waiting for backend auth uplink.
                   </p>
                 </div>

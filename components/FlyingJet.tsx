@@ -173,11 +173,11 @@ export function FlyingJet() {
             alt="Sci-Fi Jet"
             width={400}
             height={400}
-            className="w-48 h-48 md:w-64 md:h-64 object-contain opacity-90 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(0,243,255,0.6)]"
+            className="w-24 h-24 sm:w-32 sm:h-32 md:w-48 md:h-48 lg:w-64 lg:h-64 object-contain opacity-90 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_15px_rgba(0,243,255,0.6)]"
             priority
           />
           {/* Glow behind the jet */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 md:w-40 md:h-40 bg-cyan-400/20 blur-2xl pointer-events-none rounded-full"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 bg-cyan-400/20 blur-2xl pointer-events-none rounded-full"></div>
         </div>
       </div>
     </>
