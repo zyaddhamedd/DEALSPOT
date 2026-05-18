@@ -3,6 +3,9 @@ export type ProductReview = {
   name: string;
   rating: number;
   comment: string;
+  date?: string;
+  variant?: string;
+  verified?: boolean;
 };
 
 export type ProductFaq = {
