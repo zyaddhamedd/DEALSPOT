@@ -110,6 +110,15 @@ export const orderItems = pgTable("order_items", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const analyticsVisits = pgTable("analytics_visits", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  visitorId: varchar("visitor_id", { length: 255 }).notNull(),
+  pathname: varchar("pathname", { length: 255 }).notNull(),
+  userAgent: text("user_agent"),
+  referrer: text("referrer"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // --- Relations ---
 import { relations } from "drizzle-orm";
 

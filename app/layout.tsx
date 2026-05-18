@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import FacebookPixel from "@/components/analytics/FacebookPixel";
+import VisitorTracker from "@/components/analytics/VisitorTracker";
 
 export const metadata: Metadata = {
   title: "DealSpot — اطلب دلوقتي والدفع عند الاستلام",
@@ -29,6 +30,7 @@ export default function RootLayout({
       </head>
       <body>
         <FacebookPixel />
+        <VisitorTracker />
         {children}
       </body>
     </html>
