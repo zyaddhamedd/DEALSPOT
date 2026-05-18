@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createOrder } from "@/src/lib/server/orders";
+import { sendMetaCAPIPurchaseEvent } from "@/src/lib/server/analytics";
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,6 +9,15 @@ export async function POST(request: NextRequest) {
     // The payload coming from the client might need the productSlug
     // We expect the body to contain the OrderPayload + productSlug
     const order = await createOrder(body);
+
+    // Fire-and-forget server-side CAPI Purchase event tracking in the background
+    sendMetaCAPIPurchaseEvent({
+      request,
+      order,
+      payload: body,
+    }).catch((err) => {
+      console.warn("[Meta CAPI Warning] Fire-and-forget background CAPI event failed:", err.message);
+    });
 
     return NextResponse.json({
       success: true,
