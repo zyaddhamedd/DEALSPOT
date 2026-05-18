@@ -14,6 +14,7 @@ import { CountdownTimer } from "@/components/product/CountdownTimer";
 import { OrderForm } from "@/components/OrderForm";
 import { loadProducts } from "@/lib/productStorage";
 import { Product } from "@/lib/types";
+import { trackMetaEvent } from "@/components/analytics/trackMetaEvent";
 
 type ProductLandingClientProps = {
   product: Product;
@@ -28,6 +29,22 @@ export function ProductLandingClient({ product }: ProductLandingClientProps) {
   const orderRef = useRef<HTMLDivElement | null>(null);
   const sizeRef = useRef<HTMLDivElement | null>(null);
   const colorRef = useRef<HTMLDivElement | null>(null);
+
+  const hasTrackedView = useRef(false);
+  const hasTrackedCheckout = useRef(false);
+
+  useEffect(() => {
+    if (!hasTrackedView.current) {
+      trackMetaEvent("ViewContent", {
+        content_name: product.name,
+        content_ids: [product.id],
+        content_type: "product",
+        value: product.salePrice,
+        currency: "EGP",
+      });
+      hasTrackedView.current = true;
+    }
+  }, [product]);
 
   // Sync with Database or localStorage product data
   useEffect(() => {
@@ -73,6 +90,16 @@ export function ProductLandingClient({ product }: ProductLandingClientProps) {
   }, [currentProduct.images, product.images]);
 
   const scrollToOrder = () => {
+    if (!hasTrackedCheckout.current) {
+      trackMetaEvent("InitiateCheckout", {
+        content_name: currentProduct.name,
+        content_ids: [currentProduct.id],
+        value: currentProduct.salePrice,
+        currency: "EGP",
+      });
+      hasTrackedCheckout.current = true;
+    }
+
     if (currentProduct.colors && currentProduct.colors.length > 0 && !selectedColor) {
       setColorError(true);
       colorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });

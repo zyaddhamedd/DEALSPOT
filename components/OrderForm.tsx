@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { createOrder } from "@/lib/storage";
 import { OrderPayload, Product } from "@/lib/types";
+import { trackMetaEvent } from "@/components/analytics/trackMetaEvent";
 
 type OrderFormProps = {
   product: Product;
@@ -162,6 +163,14 @@ export function OrderForm({
 
       // 2. Local Legacy Storage (for current admin view)
       createOrder(product, payload);
+
+      // Track Lead event after successful order submission
+      trackMetaEvent("Lead", {
+        content_name: product.name,
+        content_ids: [product.id],
+        value: product.salePrice,
+        currency: "EGP",
+      });
 
       setSuccessMessage("تم تسجيل طلبك بنجاح، هنتواصل معاك لتأكيد الأوردر.");
       setForm({
