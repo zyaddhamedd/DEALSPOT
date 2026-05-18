@@ -233,6 +233,16 @@ export function ProductLandingClient({ product }: ProductLandingClientProps) {
               onSizeChange={setSelectedSize}
               onColorChange={setSelectedColor}
               onSuccess={scrollToOrderDirect}
+              onColorValidationError={() => {
+                setColorError(true);
+                colorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                setTimeout(() => setColorError(false), 2500);
+              }}
+              onSizeValidationError={() => {
+                setSizeError(true);
+                sizeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                setTimeout(() => setSizeError(false), 2500);
+              }}
             />
           </section>
 

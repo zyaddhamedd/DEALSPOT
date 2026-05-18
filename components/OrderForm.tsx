@@ -12,6 +12,8 @@ type OrderFormProps = {
   onSizeChange: (size: string) => void;
   onColorChange: (color: string) => void;
   onSuccess?: () => void;
+  onColorValidationError?: () => void;
+  onSizeValidationError?: () => void;
 };
 
 type FormErrors = Partial<Record<keyof OrderPayload, string>>;
@@ -90,6 +92,8 @@ export function OrderForm({
   onSizeChange,
   onColorChange,
   onSuccess,
+  onColorValidationError,
+  onSizeValidationError,
 }: OrderFormProps) {
   const [form, setForm] = useState<OrderPayload>({
     fullName: "",
@@ -147,6 +151,19 @@ export function OrderForm({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // Smooth scroll to and shake the ColorSelector if color is missing
+    if (product.colors && product.colors.length > 0 && !selectedColorValue) {
+      onColorValidationError?.();
+      return;
+    }
+
+    // Smooth scroll to and shake the SizeSelector if size is missing
+    if (!selectedSizeValue) {
+      onSizeValidationError?.();
+      return;
+    }
+
     if (!validate()) return;
     setIsSubmitting(true);
 
