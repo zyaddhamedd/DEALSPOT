@@ -319,9 +319,17 @@ export function OrderForm({
               inputMode="tel"
               placeholder="مثال: 01012345678"
               value={form.phone}
-              onChange={(e) =>
-                setForm((prev) => ({ ...prev, phone: e.target.value }))
-              }
+              onChange={(e) => {
+                const rawVal = e.target.value;
+                const arabicNumbers = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+                let normalized = rawVal;
+                for (let i = 0; i < 10; i++) {
+                  normalized = normalized.split(arabicNumbers[i]).join(String(i));
+                }
+                // Keep only digits and plus sign, removing spaces, dashes, and other characters
+                normalized = normalized.replace(/[^\d+]/g, "");
+                setForm((prev) => ({ ...prev, phone: normalized }));
+              }}
             />
             <FieldError message={errors.phone} />
           </div>

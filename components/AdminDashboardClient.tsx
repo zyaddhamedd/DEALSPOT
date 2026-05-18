@@ -14,9 +14,24 @@ export function AdminDashboardClient() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setOrders(loadOrders());
-    setProducts(loadProducts());
-    setReady(true);
+    const fetchRealData = async () => {
+      try {
+        const res = await fetch("/api/admin/orders");
+        if (res.ok) {
+          const data = await res.json();
+          setOrders(data);
+        } else {
+          setOrders(loadOrders());
+        }
+      } catch (err) {
+        console.error("Failed to fetch admin orders:", err);
+        setOrders(loadOrders());
+      }
+      setProducts(loadProducts());
+      setReady(true);
+    };
+
+    void fetchRealData();
   }, []);
 
   const stats = useMemo(() => {
